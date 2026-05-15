@@ -5,7 +5,7 @@ CMAKE_OPT=-DBENCHMARK_DOWNLOAD_DEPENDENCIES=on -DCMAKE_BUILD_TYPE=Release
 HEADERS=fast_B-trees/include/dynamic_search.hpp fast_B-trees/include/internal.hpp \
 	    fast_B-trees/include/static_search.hpp
 
-bench: bench.cpp benchmark/build/lib/libgtest.a $(HEADERS)
+bench: bench.cpp benchmark/build/src/libbenchmark.a $(HEADERS)
 	g++ $(CFLAGS) -DNDEBUG -Ofast bench.cpp $(BENCH) -o bench
 
 benchmark/include:
