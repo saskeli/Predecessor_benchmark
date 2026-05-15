@@ -1,0 +1,12 @@
+[submodule "fast_B-trees"]
+	path = fast_B-trees
+	url = https://github.com/saskeli/fast_B-trees.git
+[submodule "benchmark"]
+	path = benchmark
+	url = https://github.com/google/benchmark.git
+[submodule "sdsl-lite"]
+	path = sdsl-lite
+	url = https://github.com/xxsds/sdsl-lite.git
+[submodule "abseil-cpp"]
+	path = abseil-cpp
+	url = https://github.com/abseil/abseil-cpp.git
