@@ -16,9 +16,10 @@ fast_B-trees/include:
 
 fast_B-trees/include/%.hpp: | fast_B-trees/include
 
-benchmark/build/lib/libgtest.a: | benchmark/include
+benchmark/build/src/libbenchmark.a: | benchmark/include
 	mkdir -p benchmark/build
 	(cd benchmark; cmake $(CMAKE_OPT) -S . -B "build")
-	(cd benchmark; cmake --build "build" --config Release)
+	(cd benchmark/build/src; make)
 
-
+abseil-cpp/absl/container/btree_set.h:
+	git submodule update --init
