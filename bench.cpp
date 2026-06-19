@@ -1,152 +1,359 @@
-#include "absl/container/btree_set.h"
 #include <benchmark/benchmark.h>
 
 #include <algorithm>
+#include <flat_set>
 #include <random>
 #include <set>
+#include <unordered_set>
 #include <vector>
 
+#include "absl/container/btree_set.h"
 #include "fast_B-trees/include/dynamic_search.hpp"
 #include "fast_B-trees/include/static_search.hpp"
+#include "op_templates.hpp"
 
-void BM_std_set_pred(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
+template <class set_t, class T>
+void BM_pred(benchmark::State& state) {
   size_t n = state.range(0);
   const constexpr size_t queries = 1000;
-  std::set<int64_t> set;
-  std::vector<int64_t> q_vec;
+  std::vector<T> q_vec;
+  set_t set = pt::with<set_t, T>::build(n, queries / 2, queries / 2, q_vec);
 
-  while (set.size() < n) {
-    int64_t val = -dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-    if (q_vec.size() < queries / 2) {
-      q_vec.push_back(val);
-    }
-  }
-
-  while (q_vec.size() < queries) {
-    int64_t val = -dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    q_vec.push_back(val);
-  }
-
-  std::shuffle(q_vec.begin(), q_vec.end(), gen);
   auto e = set.end();
   int64_t checksum = 0;
   for (auto _ : state) {
     for (auto v : q_vec) {
-      checksum += set.lower_bound(v) != e;
+      checksum += pt::with<set_t, T>::pred(set, v) != e;
     }
   }
   state.SetLabel(std::to_string(checksum));
   state.SetItemsProcessed(state.iterations() * queries);
 }
-BENCHMARK(BM_std_set_pred)
+
+BENCHMARK(BM_pred<std::set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_pred<std::set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_pred<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
     ->Arg(1000)
     ->Arg(10000)
     ->Arg(100000)
     ->Arg(1000000)
     ->Arg(10000000);
 
-void BM_std_set_contains(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
-  size_t n = state.range(0);
-  const constexpr size_t queries = 1000;
-  std::set<int64_t> set;
-  std::vector<int64_t> q_vec;
-
-  while (set.size() < n) {
-    int64_t val = -dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-    if (q_vec.size() < queries / 2) {
-      q_vec.push_back(val);
-    }
-  }
-
-  while (q_vec.size() < queries) {
-    int64_t val = -dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    q_vec.push_back(val);
-  }
-
-  std::shuffle(q_vec.begin(), q_vec.end(), gen);
-  int64_t checksum = 0;
-  for (auto _ : state) {
-    for (auto v : q_vec) {
-      checksum += set.contains(v);
-    }
-  }
-  state.SetLabel(std::to_string(checksum));
-  state.SetItemsProcessed(state.iterations() * queries);
-}
-BENCHMARK(BM_std_set_contains)
+BENCHMARK(BM_pred<std::flat_set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_pred<std::flat_set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_pred<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
     ->Arg(1000)
     ->Arg(10000)
     ->Arg(100000)
     ->Arg(1000000)
     ->Arg(10000000);
 
-void BM_std_set_access(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
+BENCHMARK(BM_pred<absl::btree_set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_pred<absl::btree_set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_pred<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+
+BENCHMARK(BM_pred<bt::dynamic_set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_pred<bt::dynamic_set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_pred<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+
+BENCHMARK(BM_pred<bt::static_set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_pred<bt::static_set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_pred<bt::static_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+
+template<class set_t, class T>
+void BM_contains(benchmark::State& state) {
   size_t n = state.range(0);
   const constexpr size_t queries = 1000;
-
-  bt::dynamic_set<int64_t> set;
-  std::vector<int64_t> q_vec;
-
-  while (set.size() < n) {
-    int64_t val = -dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-    if (q_vec.size() < queries) {
-      q_vec.push_back(val);
-    }
-  }
+  std::vector<T> q_vec;
+  set_t set = pt::with<set_t, T>::build(n, queries / 2, queries / 2, q_vec);
   int64_t checksum = 0;
   for (auto _ : state) {
     for (auto v : q_vec) {
-      checksum += *set.lower_bound(v);
+      checksum += pt::with<set_t, T>::contains(set, v);
+    }
+  }
+  state.SetLabel(std::to_string(checksum));
+  state.SetItemsProcessed(state.iterations() * queries);
+}
+
+BENCHMARK(BM_contains<std::set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_contains<std::set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_contains<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+
+BENCHMARK(BM_contains<std::flat_set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_contains<std::flat_set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_contains<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+
+BENCHMARK(BM_contains<absl::btree_set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_contains<absl::btree_set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_contains<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+
+BENCHMARK(BM_contains<bt::dynamic_set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_contains<bt::dynamic_set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_contains<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+
+BENCHMARK(BM_contains<bt::static_set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_contains<bt::static_set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_contains<bt::static_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+
+template<class set_t, class T>
+void BM_access(benchmark::State& state) {
+  size_t n = state.range(0);
+  const constexpr size_t queries = 1000;
+  std::vector<T> q_vec;
+  set_t set = pt::with<set_t, T>::build(n, queries, 0, q_vec);
+
+  T checksum{};
+  for (auto _ : state) {
+    for (auto v : q_vec) {
+      checksum += *pt::with<set_t, T>::pred(set, v);
     }
   }
   state.SetLabel(std::to_string(-checksum));
   state.SetItemsProcessed(state.iterations() * queries);
 }
-BENCHMARK(BM_std_set_access)
+
+BENCHMARK(BM_access<std::set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_access<std::set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_access<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
     ->Arg(1000)
     ->Arg(10000)
     ->Arg(100000)
     ->Arg(1000000)
     ->Arg(10000000);
 
-void BM_std_set_sum(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
+BENCHMARK(BM_access<std::flat_set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_access<std::flat_set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_access<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+
+BENCHMARK(BM_access<absl::btree_set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_access<absl::btree_set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_access<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+
+BENCHMARK(BM_access<bt::dynamic_set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_access<bt::dynamic_set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_access<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+
+BENCHMARK(BM_access<bt::static_set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_access<bt::static_set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_access<bt::static_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+
+template<class set_t, class T>
+void BM_sum(benchmark::State& state) {
   size_t n = state.range(0);
+  std::vector<T> q_vec;
+  set_t set = pt::with<set_t, T>::build(n, 0, 0, q_vec);
 
-  std::set<int64_t> set;
-
-  while (set.size() < n) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-  }
   int64_t checksum = 0;
   for (auto _ : state) {
     for (auto v : set) {
@@ -156,912 +363,292 @@ void BM_std_set_sum(benchmark::State& state) {
   state.SetLabel(std::to_string(checksum));
   state.SetItemsProcessed(state.iterations() * set.size());
 }
-BENCHMARK(BM_std_set_sum)
+
+BENCHMARK(BM_sum<std::set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_sum<std::set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_sum<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
     ->Arg(1000)
     ->Arg(10000)
     ->Arg(100000)
     ->Arg(1000000)
     ->Arg(10000000);
 
-void BM_std_set_insert(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
+BENCHMARK(BM_sum<std::flat_set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_sum<std::flat_set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_sum<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+
+BENCHMARK(BM_sum<absl::btree_set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_sum<absl::btree_set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_sum<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+
+BENCHMARK(BM_sum<bt::dynamic_set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_sum<bt::dynamic_set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_sum<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+
+BENCHMARK(BM_sum<bt::static_set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_sum<bt::static_set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_sum<bt::static_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+
+template<class set_t, class T>
+void BM_insert(benchmark::State& state) {
   size_t n = state.range(0);
   const constexpr size_t queries = 1000;
-  std::set<int64_t> set;
-  std::vector<int64_t> q_vec;
+  std::vector<T> q_vec;
+  set_t set = pt::with<set_t, T>::build(n - queries / 2, 0, queries, q_vec);
 
-  while (set.size() < n - queries / 2) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-  }
-
-  while (q_vec.size() < queries) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    q_vec.push_back(val);
-  }
-
+  int64_t checksum = 0;
   for (auto _ : state) {
     for (auto v : q_vec) {
-      set.insert(v);
+      checksum += pt::with<set_t, T>::insert(set, v);
     }
     state.PauseTiming();
     for (auto v : q_vec) {
-      set.erase(v);
+      pt::with<set_t, T>::remove(set, v);
     }
     state.ResumeTiming();
   }
+  state.SetLabel(std::to_string(checksum));
   state.SetItemsProcessed(state.iterations() * queries);
 }
-BENCHMARK(BM_std_set_insert)
+
+BENCHMARK(BM_insert<std::set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_insert<std::set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_insert<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
     ->Arg(1000)
     ->Arg(10000)
     ->Arg(100000)
     ->Arg(1000000)
     ->Arg(10000000);
 
-void BM_std_set_remove(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
+BENCHMARK(BM_insert<std::flat_set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_insert<std::flat_set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_insert<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+
+BENCHMARK(BM_insert<absl::btree_set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_insert<absl::btree_set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_insert<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+
+BENCHMARK(BM_insert<bt::dynamic_set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_insert<bt::dynamic_set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_insert<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+
+template<class set_t, class T>
+void BM_remove(benchmark::State& state) {
   size_t n = state.range(0);
   const constexpr size_t queries = 1000;
-  std::set<int64_t> set;
-  std::vector<int64_t> q_vec;
+  std::vector<T> q_vec;
+  set_t set = pt::with<set_t, T>::build(n + queries / 2, queries, 0, q_vec);
 
-  while (set.size() < n - queries / 2) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-  }
-
-  while (q_vec.size() < queries) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-    q_vec.push_back(val);
-  }
-
+  int64_t checksum = 0;
   for (auto _ : state) {
     for (auto v : q_vec) {
-      set.erase(v);
+      checksum += pt::with<set_t, T>::remove(set, v);
     }
     state.PauseTiming();
     for (auto v : q_vec) {
-      set.insert(v);
+      pt::with<set_t, T>::insert(set, v);
     }
     state.ResumeTiming();
   }
-  state.SetItemsProcessed(state.iterations() * queries);
-}
-BENCHMARK(BM_std_set_remove)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-
-void BM_bt_set_access(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
-  size_t n = state.range(0);
-  const constexpr size_t queries = 1000;
-
-  bt::dynamic_set<int64_t> set;
-  std::vector<int64_t> q_vec;
-
-  while (set.size() < n) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-    if (q_vec.size() < queries) {
-      q_vec.push_back(val);
-    }
-  }
-  int64_t checksum = 0;
-  for (auto _ : state) {
-    for (auto v : q_vec) {
-      checksum += *set.predecessor(v);
-    }
-  }
   state.SetLabel(std::to_string(checksum));
   state.SetItemsProcessed(state.iterations() * queries);
 }
-BENCHMARK(BM_bt_set_access)
+
+BENCHMARK(BM_remove<std::set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_remove<std::set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_remove<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
     ->Arg(1000)
     ->Arg(10000)
     ->Arg(100000)
     ->Arg(1000000)
     ->Arg(10000000);
 
-void BM_bt_set_sum(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
-  size_t n = state.range(0);
-
-  bt::dynamic_set<int64_t> set;
-
-  while (set.size() < n) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-  }
-  int64_t checksum = 0;
-  for (auto _ : state) {
-    for (auto v : set) {
-      checksum += v;
-    }
-  }
-  state.SetLabel(std::to_string(checksum));
-  state.SetItemsProcessed(state.iterations() * set.size());
-}
-BENCHMARK(BM_bt_set_sum)
+BENCHMARK(BM_remove<std::flat_set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_remove<std::flat_set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_remove<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
     ->Arg(1000)
     ->Arg(10000)
     ->Arg(100000)
     ->Arg(1000000)
     ->Arg(10000000);
 
-void BM_bt_set_pred(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
-  size_t n = state.range(0);
-  const constexpr size_t queries = 1000;
-  bt::dynamic_set<int64_t> set;
-  std::vector<int64_t> q_vec;
-
-  while (set.size() < n) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-    if (q_vec.size() < queries / 2) {
-      q_vec.push_back(val);
-    }
-  }
-
-  while (q_vec.size() < queries) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    q_vec.push_back(val);
-  }
-
-  std::shuffle(q_vec.begin(), q_vec.end(), gen);
-  auto e = set.end();
-  int64_t checksum = 0;
-  for (auto _ : state) {
-    for (auto v : q_vec) {
-      checksum += set.predecessor(v) != e;
-    }
-  }
-  state.SetLabel(std::to_string(checksum));
-  state.SetItemsProcessed(state.iterations() * queries);
-}
-BENCHMARK(BM_bt_set_pred)
+BENCHMARK(BM_remove<absl::btree_set<int64_t>, int64_t>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_remove<absl::btree_set<float>, float>)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000)
+    ->Arg(1000000)
+    ->Arg(10000000);
+BENCHMARK(BM_remove<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
     ->Arg(1000)
     ->Arg(10000)
     ->Arg(100000)
     ->Arg(1000000)
     ->Arg(10000000);
 
-void BM_bt_set_contains(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
-  size_t n = state.range(0);
-  const constexpr size_t queries = 1000;
-  bt::dynamic_set<int64_t> set;
-  std::vector<int64_t> q_vec;
-
-  while (set.size() < n) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-    if (q_vec.size() < queries / 2) {
-      q_vec.push_back(val);
-    }
-  }
-
-  while (q_vec.size() < queries) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    q_vec.push_back(val);
-  }
-
-  std::shuffle(q_vec.begin(), q_vec.end(), gen);
-  int64_t checksum = 0;
-  for (auto _ : state) {
-    for (auto v : q_vec) {
-      checksum += set.contains(v);
-    }
-  }
-  state.SetLabel(std::to_string(checksum));
-  state.SetItemsProcessed(state.iterations() * queries);
-}
-BENCHMARK(BM_bt_set_contains)
+BENCHMARK(BM_remove<bt::dynamic_set<int64_t>, int64_t>)
     ->Arg(1000)
     ->Arg(10000)
     ->Arg(100000)
     ->Arg(1000000)
     ->Arg(10000000);
-
-void BM_bt_set_insert(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
-  size_t n = state.range(0);
-  const constexpr size_t queries = 1000;
-  bt::dynamic_set<int64_t> set;
-  std::vector<int64_t> q_vec;
-
-  while (set.size() < n - queries / 2) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-  }
-
-  while (q_vec.size() < queries) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    q_vec.push_back(val);
-  }
-
-  for (auto _ : state) {
-    for (auto v : q_vec) {
-      set.insert(v);
-    }
-    state.PauseTiming();
-    for (auto v : q_vec) {
-      set.remove(v);
-    }
-    state.ResumeTiming();
-  }
-  state.SetItemsProcessed(state.iterations() * queries);
-}
-BENCHMARK(BM_bt_set_insert)
+BENCHMARK(BM_remove<bt::dynamic_set<float>, float>)
     ->Arg(1000)
     ->Arg(10000)
     ->Arg(100000)
     ->Arg(1000000)
     ->Arg(10000000);
-
-void BM_bt_set_remove(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
-  size_t n = state.range(0);
-  const constexpr size_t queries = 1000;
-  bt::dynamic_set<int64_t> set;
-  std::vector<int64_t> q_vec;
-
-  while (set.size() < n - queries / 2) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-  }
-
-  while (q_vec.size() < queries) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-    q_vec.push_back(val);
-  }
-
-  for (auto _ : state) {
-    for (auto v : q_vec) {
-      set.remove(v);
-    }
-    state.PauseTiming();
-    for (auto v : q_vec) {
-      set.insert(v);
-    }
-    state.ResumeTiming();
-  }
-  state.SetItemsProcessed(state.iterations() * queries);
-}
-BENCHMARK(BM_bt_set_remove)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-
-void BM_absl_set_access(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
-  size_t n = state.range(0);
-  const constexpr size_t queries = 1000;
-
-  absl::btree_set<int64_t> set;
-  std::vector<int64_t> q_vec;
-
-  while (set.size() < n) {
-    int64_t val = -dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-    if (q_vec.size() < queries) {
-      q_vec.push_back(val);
-    }
-  }
-  int64_t checksum = 0;
-  for (auto _ : state) {
-    for (auto v : q_vec) {
-      checksum += *set.lower_bound(v);
-    }
-  }
-  state.SetLabel(std::to_string(-checksum));
-  state.SetItemsProcessed(state.iterations() * queries);
-}
-BENCHMARK(BM_absl_set_access)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-
-void BM_absl_set_sum(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
-  size_t n = state.range(0);
-
-  absl::btree_set<int64_t> set;
-
-  while (set.size() < n) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-  }
-  int64_t checksum = 0;
-  for (auto _ : state) {
-    for (auto v : set) {
-      checksum += v;
-    }
-  }
-  state.SetLabel(std::to_string(checksum));
-  state.SetItemsProcessed(state.iterations() * set.size());
-}
-BENCHMARK(BM_absl_set_sum)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-
-void BM_absl_set_pred(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
-  size_t n = state.range(0);
-  const constexpr size_t queries = 1000;
-  absl::btree_set<int64_t> set;
-  std::vector<int64_t> q_vec;
-
-  while (set.size() < n - queries / 2) {
-    int64_t val = -dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-    if (q_vec.size() < queries / 2) {
-      q_vec.push_back(val);
-    }
-  }
-
-  while (q_vec.size() < queries) {
-    int64_t val = -dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    q_vec.push_back(val);
-  }
-
-  std::shuffle(q_vec.begin(), q_vec.end(), gen);
-  auto e = set.end();
-  int64_t checksum = 0;
-  for (auto _ : state) {
-    for (auto v : q_vec) {
-      checksum += set.lower_bound(v) != e;
-    }
-  }
-  state.SetLabel(std::to_string(checksum));
-  state.SetItemsProcessed(state.iterations() * queries);
-}
-BENCHMARK(BM_absl_set_pred)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-
-void BM_absl_set_contains(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
-  size_t n = state.range(0);
-  const constexpr size_t queries = 1000;
-  absl::btree_set<int64_t> set;
-  std::vector<int64_t> q_vec;
-
-  while (set.size() < n - queries / 2) {
-    int64_t val = -dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-    if (q_vec.size() < queries / 2) {
-      q_vec.push_back(val);
-    }
-  }
-
-  while (q_vec.size() < queries) {
-    int64_t val = -dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    q_vec.push_back(val);
-  }
-
-  std::shuffle(q_vec.begin(), q_vec.end(), gen);
-  int64_t checksum = 0;
-  for (auto _ : state) {
-    for (auto v : q_vec) {
-      checksum += set.contains(v);
-    }
-  }
-  state.SetLabel(std::to_string(checksum));
-  state.SetItemsProcessed(state.iterations() * queries);
-}
-BENCHMARK(BM_absl_set_contains)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-
-void BM_absl_set_insert(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
-  size_t n = state.range(0);
-  const constexpr size_t queries = 1000;
-  absl::btree_set<int64_t> set;
-  std::vector<int64_t> q_vec;
-
-  while (set.size() < n - queries / 2) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-  }
-
-  while (q_vec.size() < queries) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    q_vec.push_back(val);
-  }
-
-  for (auto _ : state) {
-    for (auto v : q_vec) {
-      set.insert(v);
-    }
-    state.PauseTiming();
-    for (auto v : q_vec) {
-      set.erase(v);
-    }
-    state.ResumeTiming();
-  }
-  state.SetItemsProcessed(state.iterations() * queries);
-}
-BENCHMARK(BM_absl_set_insert)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-
-void BM_absl_set_remove(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
-  size_t n = state.range(0);
-  const constexpr size_t queries = 1000;
-  absl::btree_set<int64_t> set;
-  std::vector<int64_t> q_vec;
-
-  while (set.size() < n - queries / 2) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-  }
-
-  while (q_vec.size() < queries) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-    q_vec.push_back(val);
-  }
-
-  for (auto _ : state) {
-    for (auto v : q_vec) {
-      set.erase(v);
-    }
-    state.PauseTiming();
-    for (auto v : q_vec) {
-      set.insert(v);
-    }
-    state.ResumeTiming();
-  }
-  state.SetItemsProcessed(state.iterations() * queries);
-}
-BENCHMARK(BM_absl_set_remove)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-
-void BM_std_vec_access(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
-  size_t n = state.range(0);
-  const constexpr size_t queries = 1000;
-
-  bt::dynamic_set<int64_t> set;
-  std::vector<int64_t> vec;
-  std::vector<int64_t> q_vec;
-
-  while (set.size() < n) {
-    int64_t val = -dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-    vec.push_back(val);
-    if (q_vec.size() < queries) {
-      q_vec.push_back(val);
-    }
-  }
-
-  std::sort(vec.begin(), vec.end());
-  int64_t checksum = 0;
-  for (auto _ : state) {
-    for (auto v : q_vec) {
-      checksum += *std::lower_bound(vec.begin(), vec.end(), v);
-    }
-  }
-  state.SetLabel(std::to_string(-checksum));
-  state.SetItemsProcessed(state.iterations() * queries);
-}
-BENCHMARK(BM_std_vec_access)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-
-void BM_std_vec_sum(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
-  size_t n = state.range(0);
-
-  bt::dynamic_set<int64_t> set;
-  std::vector<int64_t> vec;
-
-  while (set.size() < n) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-    vec.push_back(val);
-  }
-
-  std::sort(vec.begin(), vec.end());
-  int64_t checksum = 0;
-  for (auto _ : state) {
-    for (auto v : vec) {
-      checksum += v;
-    }
-  }
-  state.SetLabel(std::to_string(checksum));
-  state.SetItemsProcessed(state.iterations() * vec.size());
-}
-BENCHMARK(BM_std_vec_sum)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-
-void BM_std_vec_pred(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
-  size_t n = state.range(0);
-  const constexpr size_t queries = 1000;
-  std::set<int64_t> set;
-  std::vector<int64_t> q_vec;
-  std::vector<int64_t> vec;
-
-  while (set.size() < n) {
-    int64_t val = -dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-    vec.push_back(val);
-    if (q_vec.size() < queries / 2) {
-      q_vec.push_back(val);
-    }
-  }
-
-  while (q_vec.size() < queries) {
-    int64_t val = -dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    q_vec.push_back(val);
-  }
-
-  std::shuffle(q_vec.begin(), q_vec.end(), gen);
-  std::sort(vec.begin(), vec.end());
-  auto e = vec.end();
-  int64_t checksum = 0;
-  for (auto _ : state) {
-    for (auto v : q_vec) {
-      checksum += std::lower_bound(vec.begin(), vec.end(), v) != e;
-    }
-  }
-  state.SetLabel(std::to_string(checksum));
-  state.SetItemsProcessed(state.iterations() * queries);
-}
-BENCHMARK(BM_std_vec_pred)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-
-void BM_std_vec_contains(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
-  size_t n = state.range(0);
-  const constexpr size_t queries = 1000;
-  std::set<int64_t> set;
-  std::vector<int64_t> q_vec;
-  std::vector<int64_t> vec;
-
-  while (set.size() < n) {
-    int64_t val = -dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-    vec.push_back(val);
-    if (q_vec.size() < queries / 2) {
-      q_vec.push_back(val);
-    }
-  }
-
-  while (q_vec.size() < queries) {
-    int64_t val = -dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    q_vec.push_back(val);
-  }
-
-  std::shuffle(q_vec.begin(), q_vec.end(), gen);
-  std::sort(vec.begin(), vec.end());
-  int64_t checksum = 0;
-  for (auto _ : state) {
-    for (auto v : q_vec) {
-      checksum += std::binary_search(vec.begin(), vec.end(), v);
-    }
-  }
-  state.SetLabel(std::to_string(checksum));
-  state.SetItemsProcessed(state.iterations() * queries);
-}
-BENCHMARK(BM_std_vec_contains)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-
-void BM_bt_flatset_access(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
-  size_t n = state.range(0);
-  const constexpr size_t queries = 1000;
-
-  bt::dynamic_set<int64_t> set;
-  std::vector<int64_t> vec;
-  std::vector<int64_t> q_vec;
-
-  while (set.size() < n) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-    vec.push_back(val);
-    if (q_vec.size() < queries) {
-      q_vec.push_back(val);
-    }
-  }
-
-  bt::static_set s_set(vec);
-  int64_t checksum = 0;
-  for (auto _ : state) {
-    for (auto v : q_vec) {
-      checksum += *s_set.predecessor(v);
-    }
-  }
-  state.SetLabel(std::to_string(checksum));
-  state.SetItemsProcessed(state.iterations() * queries);
-}
-BENCHMARK(BM_bt_flatset_access)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-
-void BM_bt_flatset_sum(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
-  size_t n = state.range(0);
-
-  bt::dynamic_set<int64_t> set;
-  std::vector<int64_t> vec;
-
-  while (set.size() < n) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-    vec.push_back(val);
-  }
-
-  bt::static_set s_set(vec);
-  int64_t checksum = 0;
-  for (auto _ : state) {
-    for (auto v : s_set) {
-      checksum += v;
-    }
-  }
-  state.SetLabel(std::to_string(checksum));
-  state.SetItemsProcessed(state.iterations() * s_set.size());
-}
-BENCHMARK(BM_bt_flatset_sum)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-
-void BM_bt_flatset_pred(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
-  size_t n = state.range(0);
-  const constexpr size_t queries = 1000;
-  std::set<int64_t> set;
-  std::vector<int64_t> q_vec;
-  std::vector<int64_t> vec;
-
-  while (set.size() < n) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-    vec.push_back(val);
-    if (q_vec.size() < queries / 2) {
-      q_vec.push_back(val);
-    }
-  }
-
-  while (q_vec.size() < queries) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    q_vec.push_back(val);
-  }
-
-  std::shuffle(q_vec.begin(), q_vec.end(), gen);
-  bt::static_set s_set(vec);
-  auto e = s_set.end();
-  int64_t checksum = 0;
-  for (auto _ : state) {
-    for (auto v : q_vec) {
-      checksum += s_set.predecessor(v) != e;
-    }
-  }
-  state.SetLabel(std::to_string(checksum));
-  state.SetItemsProcessed(state.iterations() * queries);
-}
-BENCHMARK(BM_bt_flatset_pred)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-
-void BM_bt_flatset_contains(benchmark::State& state) {
-  std::mt19937_64 gen;
-  std::uniform_int_distribution<int64_t> dist(0, 100000000);
-  size_t n = state.range(0);
-  const constexpr size_t queries = 1000;
-  std::set<int64_t> set;
-  std::vector<int64_t> q_vec;
-  std::vector<int64_t> vec;
-
-  while (set.size() < n) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    set.insert(val);
-    vec.push_back(val);
-    if (q_vec.size() < queries / 2) {
-      q_vec.push_back(val);
-    }
-  }
-
-  while (q_vec.size() < queries) {
-    int64_t val = dist(gen);
-    if (set.contains(val)) {
-      continue;
-    }
-    q_vec.push_back(val);
-  }
-
-  std::shuffle(q_vec.begin(), q_vec.end(), gen);
-  bt::static_set s_set(vec);
-  int64_t checksum = 0;
-  for (auto _ : state) {
-    for (auto v : q_vec) {
-      checksum += s_set.contains(v);
-    }
-  }
-  state.SetLabel(std::to_string(checksum));
-  state.SetItemsProcessed(state.iterations() * queries);
-}
-BENCHMARK(BM_bt_flatset_contains)
+BENCHMARK(BM_remove<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
     ->Arg(1000)
     ->Arg(10000)
     ->Arg(100000)
