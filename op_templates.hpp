@@ -73,9 +73,9 @@ class random_er {
  public:
   std::mt19937_64 gen;
   std::uniform_int_distribution<int64_t> i_dist;
-  std::uniform_real_distribution<float> r_dist;
+  std::uniform_real_distribution<double> r_dist;
 
-  random_er() : gen(), i_dist(), r_dist(0, std::numeric_limits<float>::max()) {}
+  random_er() : gen(), i_dist(), r_dist(0, std::numeric_limits<double>::max()) {}
 
   template <class T>
   T get();
@@ -87,7 +87,7 @@ inline int64_t random_er::get<int64_t>() {
 }
 
 template <>
-inline float random_er::get<float>() {
+inline double random_er::get<double>() {
   return r_dist(gen);
 }
 
@@ -342,8 +342,8 @@ void print_dt<int64_t>() {
 }
 
 template <>
-void print_dt<float>() {
-  std::cout << "Data type: float\n";
+void print_dt<double>() {
+  std::cout << "Data type: double\n";
 }
 
 template <>

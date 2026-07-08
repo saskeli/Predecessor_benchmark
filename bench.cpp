@@ -12,6 +12,8 @@
 #include "fast_B-trees/include/static_search.hpp"
 #include "op_templates.hpp"
 
+#define NUMS ->Arg(1000)->Arg(10000)->Arg(100000)->Arg(1000000)->Arg(10000000)->Arg(100000000)
+
 template <class set_t, class T>
 void BM_pred(benchmark::State& state) {
   size_t n = state.range(0);
@@ -30,100 +32,25 @@ void BM_pred(benchmark::State& state) {
   state.SetItemsProcessed(state.iterations() * queries);
 }
 
-BENCHMARK(BM_pred<std::set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_pred<std::set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_pred<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_pred<std::set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_pred<std::set<double>, double>)NUMS;
+BENCHMARK(BM_pred<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
-BENCHMARK(BM_pred<std::flat_set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_pred<std::flat_set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_pred<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_pred<std::flat_set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_pred<std::flat_set<double>, double>)NUMS;
+BENCHMARK(BM_pred<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
-BENCHMARK(BM_pred<absl::btree_set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_pred<absl::btree_set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_pred<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_pred<absl::btree_set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_pred<absl::btree_set<double>, double>)NUMS;
+BENCHMARK(BM_pred<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
-BENCHMARK(BM_pred<bt::dynamic_set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_pred<bt::dynamic_set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_pred<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_pred<bt::dynamic_set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_pred<bt::dynamic_set<double>, double>)NUMS;
+BENCHMARK(BM_pred<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
-BENCHMARK(BM_pred<bt::static_set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_pred<bt::static_set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_pred<bt::static_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_pred<bt::static_set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_pred<bt::static_set<double>, double>)NUMS;
+BENCHMARK(BM_pred<bt::static_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
 template<class set_t, class T>
 void BM_contains(benchmark::State& state) {
@@ -141,100 +68,25 @@ void BM_contains(benchmark::State& state) {
   state.SetItemsProcessed(state.iterations() * queries);
 }
 
-BENCHMARK(BM_contains<std::set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_contains<std::set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_contains<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_contains<std::set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_contains<std::set<double>, double>)NUMS;
+BENCHMARK(BM_contains<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
-BENCHMARK(BM_contains<std::flat_set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_contains<std::flat_set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_contains<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_contains<std::flat_set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_contains<std::flat_set<double>, double>)NUMS;
+BENCHMARK(BM_contains<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
-BENCHMARK(BM_contains<absl::btree_set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_contains<absl::btree_set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_contains<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_contains<absl::btree_set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_contains<absl::btree_set<double>, double>)NUMS;
+BENCHMARK(BM_contains<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
-BENCHMARK(BM_contains<bt::dynamic_set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_contains<bt::dynamic_set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_contains<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_contains<bt::dynamic_set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_contains<bt::dynamic_set<double>, double>)NUMS;
+BENCHMARK(BM_contains<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
-BENCHMARK(BM_contains<bt::static_set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_contains<bt::static_set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_contains<bt::static_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_contains<bt::static_set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_contains<bt::static_set<double>, double>)NUMS;
+BENCHMARK(BM_contains<bt::static_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
 template<class set_t, class T>
 void BM_access(benchmark::State& state) {
@@ -253,100 +105,25 @@ void BM_access(benchmark::State& state) {
   state.SetItemsProcessed(state.iterations() * queries);
 }
 
-BENCHMARK(BM_access<std::set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_access<std::set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_access<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_access<std::set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_access<std::set<double>, double>)NUMS;
+BENCHMARK(BM_access<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
-BENCHMARK(BM_access<std::flat_set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_access<std::flat_set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_access<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_access<std::flat_set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_access<std::flat_set<double>, double>)NUMS;
+BENCHMARK(BM_access<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
-BENCHMARK(BM_access<absl::btree_set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_access<absl::btree_set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_access<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_access<absl::btree_set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_access<absl::btree_set<double>, double>)NUMS;
+BENCHMARK(BM_access<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
-BENCHMARK(BM_access<bt::dynamic_set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_access<bt::dynamic_set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_access<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_access<bt::dynamic_set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_access<bt::dynamic_set<double>, double>)NUMS;
+BENCHMARK(BM_access<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
-BENCHMARK(BM_access<bt::static_set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_access<bt::static_set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_access<bt::static_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_access<bt::static_set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_access<bt::static_set<double>, double>)NUMS;
+BENCHMARK(BM_access<bt::static_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
 template<class set_t, class T>
 void BM_sum(benchmark::State& state) {
@@ -364,100 +141,25 @@ void BM_sum(benchmark::State& state) {
   state.SetItemsProcessed(state.iterations() * set.size());
 }
 
-BENCHMARK(BM_sum<std::set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_sum<std::set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_sum<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_sum<std::set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_sum<std::set<double>, double>)NUMS;
+BENCHMARK(BM_sum<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
-BENCHMARK(BM_sum<std::flat_set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_sum<std::flat_set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_sum<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_sum<std::flat_set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_sum<std::flat_set<double>, double>)NUMS;
+BENCHMARK(BM_sum<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
-BENCHMARK(BM_sum<absl::btree_set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_sum<absl::btree_set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_sum<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_sum<absl::btree_set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_sum<absl::btree_set<double>, double>)NUMS;
+BENCHMARK(BM_sum<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
-BENCHMARK(BM_sum<bt::dynamic_set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_sum<bt::dynamic_set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_sum<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_sum<bt::dynamic_set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_sum<bt::dynamic_set<double>, double>)NUMS;
+BENCHMARK(BM_sum<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
-BENCHMARK(BM_sum<bt::static_set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_sum<bt::static_set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_sum<bt::static_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_sum<bt::static_set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_sum<bt::static_set<double>, double>)NUMS;
+BENCHMARK(BM_sum<bt::static_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
 template<class set_t, class T>
 void BM_insert(benchmark::State& state) {
@@ -481,81 +183,21 @@ void BM_insert(benchmark::State& state) {
   state.SetItemsProcessed(state.iterations() * queries);
 }
 
-BENCHMARK(BM_insert<std::set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_insert<std::set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_insert<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_insert<std::set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_insert<std::set<double>, double>)NUMS;
+BENCHMARK(BM_insert<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
-BENCHMARK(BM_insert<std::flat_set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_insert<std::flat_set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_insert<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_insert<std::flat_set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_insert<std::flat_set<double>, double>)NUMS;
+BENCHMARK(BM_insert<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
-BENCHMARK(BM_insert<absl::btree_set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_insert<absl::btree_set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_insert<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_insert<absl::btree_set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_insert<absl::btree_set<double>, double>)NUMS;
+BENCHMARK(BM_insert<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
-BENCHMARK(BM_insert<bt::dynamic_set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_insert<bt::dynamic_set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_insert<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_insert<bt::dynamic_set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_insert<bt::dynamic_set<double>, double>)NUMS;
+BENCHMARK(BM_insert<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
 template<class set_t, class T>
 void BM_remove(benchmark::State& state) {
@@ -579,80 +221,20 @@ void BM_remove(benchmark::State& state) {
   state.SetItemsProcessed(state.iterations() * queries);
 }
 
-BENCHMARK(BM_remove<std::set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_remove<std::set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_remove<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_remove<std::set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_remove<std::set<double>, double>)NUMS;
+BENCHMARK(BM_remove<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
-BENCHMARK(BM_remove<std::flat_set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_remove<std::flat_set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_remove<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_remove<std::flat_set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_remove<std::flat_set<double>, double>)NUMS;
+BENCHMARK(BM_remove<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
-BENCHMARK(BM_remove<absl::btree_set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_remove<absl::btree_set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_remove<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_remove<absl::btree_set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_remove<absl::btree_set<double>, double>)NUMS;
+BENCHMARK(BM_remove<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
-BENCHMARK(BM_remove<bt::dynamic_set<int64_t>, int64_t>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_remove<bt::dynamic_set<float>, float>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
-BENCHMARK(BM_remove<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)
-    ->Arg(1000)
-    ->Arg(10000)
-    ->Arg(100000)
-    ->Arg(1000000)
-    ->Arg(10000000);
+BENCHMARK(BM_remove<bt::dynamic_set<int64_t>, int64_t>)NUMS;
+BENCHMARK(BM_remove<bt::dynamic_set<double>, double>)NUMS;
+BENCHMARK(BM_remove<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>)NUMS;
 
 BENCHMARK_MAIN();
