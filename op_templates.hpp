@@ -12,6 +12,26 @@
 #include "fast_B-trees/include/dynamic_search.hpp"
 #include "fast_B-trees/include/static_search.hpp"
 
+#ifdef TEST_ALL
+#define TEST_STD_SET_INT
+#define TEST_STD_SET_DOUBLE
+#define TEST_STD_SET_DEC
+#define TEST_STD_FLAT_SET_INT
+#define TEST_STD_FLAT_SET_DOUBLE
+#define TEST_STD_FLAT_SET_DEC
+#define TEST_ABSL_BTREE_SET_INT
+#define TEST_ABSL_BTREE_SET_DOUBLE
+#define TEST_ABSL_BTREE_SET_DEC
+#define TEST_BT_DYNAMIC_SET_INT
+#define TEST_BT_DYNAMIC_SET_DOUBLE
+#define TEST_BT_DYNAMIC_SET_DEC
+#define TEST_BT_STATIC_SET_INT
+#define TEST_BT_STATIC_SET_DOUBLE
+#define TEST_BT_STATIC_SET_DEC
+#endif
+
+const constexpr size_t q_count = 1000000;
+
 namespace pt {
 
 template <class T>
@@ -115,6 +135,14 @@ struct with<std::set<T>, T> {
         vec.push_back(val);
       }
     }
+    while (vec.size() < hit_count) {
+      for (auto v: set) {
+        if (vec.size() >= hit_count) {
+          break;
+        }
+        vec.push_back(v);
+      }
+    }
     size_t target = hit_count + miss_count;
     while (vec.size() < target) {
       T val = -rand.get<T>();
@@ -161,6 +189,14 @@ struct with<bt::dynamic_set<T>, T> {
       set.insert(val);
       if (vec.size() < hit_count) {
         vec.push_back(val);
+      }
+    }
+    while (vec.size() < hit_count) {
+      for (auto v: set) {
+        if (vec.size() >= hit_count) {
+          break;
+        }
+        vec.push_back(v);
       }
     }
     size_t target = hit_count + miss_count;
@@ -211,6 +247,14 @@ struct with<absl::btree_set<T>, T> {
         vec.push_back(val);
       }
     }
+    while (vec.size() < hit_count) {
+      for (auto v: set) {
+        if (vec.size() >= hit_count) {
+          break;
+        }
+        vec.push_back(v);
+      }
+    }
     size_t target = hit_count + miss_count;
     while (vec.size() < target) {
       T val = -rand.get<T>();
@@ -257,6 +301,14 @@ struct with<std::flat_set<T>, T> {
       o_set.insert(val);
       if (vec.size() < hit_count) {
         vec.push_back(val);
+      }
+    }
+    while (vec.size() < hit_count) {
+      for (auto v: o_set) {
+        if (vec.size() >= hit_count) {
+          break;
+        }
+        vec.push_back(v);
       }
     }
     size_t target = hit_count + miss_count;
@@ -306,6 +358,14 @@ struct with<bt::static_set<T>, T> {
       o_set.insert(val);
       if (vec.size() < hit_count) {
         vec.push_back(val);
+      }
+    }
+    while (vec.size() < hit_count) {
+      for (auto v: o_set) {
+        if (vec.size() >= hit_count) {
+          break;
+        }
+        vec.push_back(v);
       }
     }
     size_t target = hit_count + miss_count;

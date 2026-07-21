@@ -36,6 +36,22 @@
 *.exe
 *.out
 *.app
+profile
+profile_*
+bench
+bench_*
 
 # debug information files
 *.dwo
+
+# benchmark results
+*.res
+*.prof
+
+# figures
+*.pdf
+*.png
+
+# env settings
+.ipynb_checkpoints/
+.vscode/

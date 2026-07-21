@@ -18,7 +18,7 @@
 namespace pt {
 template <class set_t, class T, class counter_t>
 void pred(counter_t& counter, uint64_t n) {
-  const constexpr size_t queries = 1000;
+  const constexpr size_t queries = q_count;
   std::vector<T> q_vec;
   with<set_t, T>::print_ds();
   set_t set = with<set_t, T>::build(n, queries / 2, queries / 2, q_vec);
@@ -38,7 +38,7 @@ void pred(counter_t& counter, uint64_t n) {
 
 template <class set_t, class T, class counter_t>
 void contains(counter_t& counter, uint64_t n) {
-  const constexpr size_t queries = 1000;
+  const constexpr size_t queries = q_count;
   std::vector<T> q_vec;
   with<set_t, T>::print_ds();
   set_t set = with<set_t, T>::build(n, queries / 2, queries / 2, q_vec);
@@ -58,7 +58,7 @@ void contains(counter_t& counter, uint64_t n) {
 
 template <class set_t, class T, class counter_t>
 void access(counter_t& counter, uint64_t n) {
-  const constexpr size_t queries = 1000;
+  const constexpr size_t queries = q_count;
   std::vector<T> q_vec;
   with<set_t, T>::print_ds();
   set_t set = with<set_t, T>::build(n, queries, 0, q_vec);
@@ -95,7 +95,7 @@ void sum(counter_t& counter, uint64_t n) {
 
 template <class set_t, class T, class counter_t>
 void insert(counter_t& counter, uint64_t n) {
-  const constexpr size_t queries = 1000;
+  const size_t queries = std::min(q_count, n);
   std::vector<T> q_vec;
   with<set_t, T>::print_ds();
   set_t set = with<set_t, T>::build(n - queries / 2, 0, queries, q_vec);
@@ -114,7 +114,7 @@ void insert(counter_t& counter, uint64_t n) {
 
 template <class set_t, class T ,class counter_t>
 void remove(counter_t& counter, uint64_t n) {
-  const constexpr size_t queries = 1000;
+  const size_t queries = std::min(q_count, n);
   std::vector<T> q_vec;
   with<set_t, T>::print_ds();
   set_t set = with<set_t, T>::build(n + queries / 2, queries, 0, q_vec);
@@ -140,94 +140,124 @@ int main() {
       counter;
   std::array<uint64_t, 6> sizes = {1000, 10000, 100000, 1000000, 10000000, 100000000};
   for (auto n : sizes) {
+#ifdef TEST_STD_SET_INT
     pt::pred<std::set<int64_t>, int64_t>(counter, n);
-    pt::pred<std::set<double>, double>(counter, n);
-    pt::pred<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::contains<std::set<int64_t>, int64_t>(counter, n);
-    pt::contains<std::set<double>, double>(counter, n);
-    pt::contains<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::access<std::set<int64_t>, int64_t>(counter, n);
-    pt::access<std::set<double>, double>(counter, n);
-    pt::access<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::sum<std::set<int64_t>, int64_t>(counter, n);
-    pt::sum<std::set<double>, double>(counter, n);
-    pt::sum<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::insert<std::set<int64_t>, int64_t>(counter, n);
-    pt::insert<std::set<double>, double>(counter, n);
-    pt::insert<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::remove<std::set<int64_t>, int64_t>(counter, n);
+#endif
+#ifdef TEST_STD_SET_DOUBLE
+    pt::pred<std::set<double>, double>(counter, n);
+    pt::contains<std::set<double>, double>(counter, n);
+    pt::access<std::set<double>, double>(counter, n);
+    pt::sum<std::set<double>, double>(counter, n);
+    pt::insert<std::set<double>, double>(counter, n);
     pt::remove<std::set<double>, double>(counter, n);
+#endif
+#ifdef TEST_STD_SET_DEC
+    pt::pred<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+    pt::contains<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+    pt::access<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+    pt::sum<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+    pt::insert<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::remove<std::set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+#endif
 
+#ifdef TEST_BT_DYNAMIC_SET_INT
     pt::pred<bt::dynamic_set<int64_t>, int64_t>(counter, n);
-    pt::pred<bt::dynamic_set<double>, double>(counter, n);
-    pt::pred<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::contains<bt::dynamic_set<int64_t>, int64_t>(counter, n);
-    pt::contains<bt::dynamic_set<double>, double>(counter, n);
-    pt::contains<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::access<bt::dynamic_set<int64_t>, int64_t>(counter, n);
-    pt::access<bt::dynamic_set<double>, double>(counter, n);
-    pt::access<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::sum<bt::dynamic_set<int64_t>, int64_t>(counter, n);
-    pt::sum<bt::dynamic_set<double>, double>(counter, n);
-    pt::sum<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::insert<bt::dynamic_set<int64_t>, int64_t>(counter, n);
-    pt::insert<bt::dynamic_set<double>, double>(counter, n);
-    pt::insert<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::remove<bt::dynamic_set<int64_t>, int64_t>(counter, n);
+#endif
+#ifdef TEST_BT_DYNAMIC_SET_DOUBLE
+    pt::pred<bt::dynamic_set<double>, double>(counter, n);
+    pt::contains<bt::dynamic_set<double>, double>(counter, n);
+    pt::access<bt::dynamic_set<double>, double>(counter, n);
+    pt::sum<bt::dynamic_set<double>, double>(counter, n);
+    pt::insert<bt::dynamic_set<double>, double>(counter, n);
     pt::remove<bt::dynamic_set<double>, double>(counter, n);
+#endif
+#ifdef TEST_BT_DYNAMIC_SET_DEC
+    pt::pred<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+    pt::contains<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+    pt::access<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+    pt::sum<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+    pt::insert<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::remove<bt::dynamic_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+#endif
 
+#ifdef TEST_ABSL_BTREE_SET_INT
     pt::pred<absl::btree_set<int64_t>, int64_t>(counter, n);
-    pt::pred<absl::btree_set<double>, double>(counter, n);
-    pt::pred<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::contains<absl::btree_set<int64_t>, int64_t>(counter, n);
-    pt::contains<absl::btree_set<double>, double>(counter, n);
-    pt::contains<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::access<absl::btree_set<int64_t>, int64_t>(counter, n);
-    pt::access<absl::btree_set<double>, double>(counter, n);
-    pt::access<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::sum<absl::btree_set<int64_t>, int64_t>(counter, n);
-    pt::sum<absl::btree_set<double>, double>(counter, n);
-    pt::sum<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::insert<absl::btree_set<int64_t>, int64_t>(counter, n);
-    pt::insert<absl::btree_set<double>, double>(counter, n);
-    pt::insert<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::remove<absl::btree_set<int64_t>, int64_t>(counter, n);
+#endif
+#ifdef TEST_ABSL_BTREE_SET_DOUBLE
+    pt::pred<absl::btree_set<double>, double>(counter, n);
+    pt::contains<absl::btree_set<double>, double>(counter, n);
+    pt::access<absl::btree_set<double>, double>(counter, n);
+    pt::sum<absl::btree_set<double>, double>(counter, n);
+    pt::insert<absl::btree_set<double>, double>(counter, n);
     pt::remove<absl::btree_set<double>, double>(counter, n);
+#endif
+#ifdef TEST_ABSL_BTREE_SET_DEC
+    pt::pred<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+    pt::contains<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+    pt::access<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+    pt::sum<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+    pt::insert<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::remove<absl::btree_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+#endif
 
+#ifdef TEST_STD_FLAT_SET_INT
     pt::pred<std::flat_set<int64_t>, int64_t>(counter, n);
-    pt::pred<std::flat_set<double>, double>(counter, n);
-    pt::pred<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::contains<std::flat_set<int64_t>, int64_t>(counter, n);
-    pt::contains<std::flat_set<double>, double>(counter, n);
-    pt::contains<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::access<std::flat_set<int64_t>, int64_t>(counter, n);
-    pt::access<std::flat_set<double>, double>(counter, n);
-    pt::access<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::sum<std::flat_set<int64_t>, int64_t>(counter, n);
-    pt::sum<std::flat_set<double>, double>(counter, n);
-    pt::sum<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::insert<std::flat_set<int64_t>, int64_t>(counter, n);
-    pt::insert<std::flat_set<double>, double>(counter, n);
-    pt::insert<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::remove<std::flat_set<int64_t>, int64_t>(counter, n);
+#endif
+#ifdef TEST_STD_FLAT_SET_DOUBLE
+    pt::pred<std::flat_set<double>, double>(counter, n);
+    pt::contains<std::flat_set<double>, double>(counter, n);
+    pt::access<std::flat_set<double>, double>(counter, n);
+    pt::sum<std::flat_set<double>, double>(counter, n);
+    pt::insert<std::flat_set<double>, double>(counter, n);
     pt::remove<std::flat_set<double>, double>(counter, n);
+#endif
+#ifdef TEST_STD_FLAT_SET_DEC
+    pt::pred<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+    pt::contains<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+    pt::access<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+    pt::sum<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+    pt::insert<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::remove<std::flat_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+#endif
 
+#ifdef TEST_BT_STATIC_SET_INT
     pt::pred<bt::static_set<int64_t>, int64_t>(counter, n);
-    pt::pred<bt::static_set<double>, double>(counter, n);
-    pt::pred<bt::static_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::contains<bt::static_set<int64_t>, int64_t>(counter, n);
-    pt::contains<bt::static_set<double>, double>(counter, n);
-    pt::contains<bt::static_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::access<bt::static_set<int64_t>, int64_t>(counter, n);
-    pt::access<bt::static_set<double>, double>(counter, n);
-    pt::access<bt::static_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::sum<bt::static_set<int64_t>, int64_t>(counter, n);
+#endif
+#ifdef TEST_BT_STATIC_SET_DOUBLE
+    pt::pred<bt::static_set<double>, double>(counter, n);
+    pt::contains<bt::static_set<double>, double>(counter, n);
+    pt::access<bt::static_set<double>, double>(counter, n);
     pt::sum<bt::static_set<double>, double>(counter, n);
+#endif
+#ifdef TEST_BT_STATIC_SET_DEC
+    pt::pred<bt::static_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+    pt::contains<bt::static_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+    pt::access<bt::static_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
     pt::sum<bt::static_set<pt::Decimal<int64_t>>, pt::Decimal<int64_t>>(counter, n);
+#endif
   }
   return 0;
 }
